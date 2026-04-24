@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bread vs Fire </title>
+    <title>BreadRoad</title>
     <link rel="stylesheet" href="BreadRoad.css">
 </head>
 <body>
     <div class="game-info">
         <h1>BreadRoad</h1>
-        <p>Use Button <b> Up/Down </b> Or <b>W/S</b> for avoid!</p>
+        <p>Use <b>A / D</b> Or <b>Arrow Left/Right</b> For avoid!</p>
         <div id="score">Score: 0</div>
     </div>
 
     <div id="game-container">
-        <div id="road"></div>
+        <div id="obstacle-container"></div>
         <div id="player"><img src="Roti.png" alt="Bread"></div>
-        <div id="obstacle"><img src="Fire.png" alt="Fire"></div>
     </div>
 
     <div id="game-over" class="hidden">
-        <h2>GAME OVER!</h2>
-        <button onclick="resetGame()">Try Again</button>
+        <h2 style="color: #e74c3c; font-size: 40px;">You lose! 🍞🔥</h2>
+        <p id="final-score" style="font-size: 20px;"></p>
+        <button onclick="resetGame()">Try again!</button>
     </div>
 
     <script src="BreadRoad.js"></script>
