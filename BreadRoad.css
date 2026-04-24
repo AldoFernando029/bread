@@ -35,19 +35,19 @@
 }
 
 #player {
-    width: 100px;
-    height: 100px;
+    width: 130px;
+    height: 130px;
     position: absolute;
     bottom: 30px;
-    left: 125px; /* Tengah */
+    left: 110px; /* Tengah */
     transition: left 0.12s ease-out;
     z-index: 5;
 }
 
 /* Class untuk api yang muncul dinamis */
 .obstacle {
-    width: 100px;
-    height: 100px;
+    width: 130px;
+    height: 130px;
     position: absolute;
     display: flex;
     align-items: center;

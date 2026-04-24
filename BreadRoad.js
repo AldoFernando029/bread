@@ -1,4 +1,5 @@
 /* eslint-env browser */
+
 const player = document.getElementById('player');
 const obstacleContainer = document.getElementById('obstacle-container');
 const scoreElement = document.getElementById('score');
@@ -6,20 +7,25 @@ const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
 let score = 0;
-let playerX = 125;
+// playerX disesuaikan dengan posisi tengah baru (110px)
+let playerX = 110; 
 let isGameOver = false;
-let gameSpeed = 7; // Mulai lebih cepat
+let gameSpeed = 7; 
 let animationId;
 let obstacles = []; 
 let spawnTimer = 0;
-const lanes = [25, 125, 225];
+
+// Jalur jalan baru disesuaikan untuk objek ukuran 130px
+// [Kiri, Tengah, Kanan] agar muat di container 350px
+const lanes = [10, 110, 210]; 
 
 // 1. KONTROL (PC)
 document.addEventListener('keydown', (e) => {
     if (isGameOver) return;
     const key = e.key.toLowerCase();
-    if ((key === 'arrowleft' || key === 'a') && playerX > 25) playerX -= 100;
-    if ((key === 'arrowright' || key === 'd') && playerX < 225) playerX += 100;
+    // Gunakan boundary (batas) jalur baru: 10 dan 210
+    if ((key === 'arrowleft' || key === 'a') && playerX > 10) playerX -= 100;
+    if ((key === 'arrowright' || key === 'd') && playerX < 210) playerX += 100;
     player.style.left = playerX + 'px';
 });
 
@@ -27,8 +33,9 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('touchstart', (e) => {
     if (isGameOver) return;
     const touchX = e.touches[0].clientX;
-    if (touchX < window.innerWidth / 2 && playerX > 25) playerX -= 100;
-    else if (touchX >= window.innerWidth / 2 && playerX < 225) playerX += 100;
+    // Gunakan boundary baru
+    if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
+    else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
     player.style.left = playerX + 'px';
     e.preventDefault();
 }, { passive: false });
@@ -40,28 +47,27 @@ function createObstacle() {
     const laneX = lanes[Math.floor(Math.random() * lanes.length)];
     
     obsDiv.style.left = laneX + 'px';
-    obsDiv.style.top = '-120px';
+    // Mulai dari lebih tinggi karena ukuran objek lebih besar (-150px)
+    obsDiv.style.top = '-150px';
     obsDiv.innerHTML = `<img src="Fire.png" alt="Fire">`;
     
     obstacleContainer.appendChild(obsDiv);
-    return { element: obsDiv, y: -120, x: laneX };
+    return { element: obsDiv, y: -150, x: laneX };
 }
 
 function gameLoop() {
     if (isGameOver) return;
 
-    // Skor & Difficulty Scaling
-    score += 0.2; // Skor naik lebih cepat
+    // Skor bertambah
+    score += 0.2; 
     scoreElement.innerText = `Score: ${Math.floor(score)}`;
     
-    // Kecepatan bertambah setiap 50 poin secara progresif
-    if (Math.floor(score) % 50 === 0) {
+    // Difficulty scaling (Phase makin cepat)
+    if (Math.floor(score) > 0 && Math.floor(score) % 50 === 0) {
         gameSpeed += 0.005; 
     }
 
-    // Sistem Muncul Api (Phase makin cepat)
     spawnTimer++;
-    // Interval spawn mengecil seiring skor (makin tinggi skor, makin rapat apinya)
     let currentSpawnInterval = Math.max(25, 80 - Math.floor(score / 15));
     
     if (spawnTimer > currentSpawnInterval) {
@@ -74,10 +80,11 @@ function gameLoop() {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
 
-        // Deteksi Tabrakan (Hitbox disesuaikan)
+        // Deteksi Tabrakan (Hitbox baru disesuaikan untuk 130px)
+        // Roti menempati Y [440, 570]. Api menempati Y [obs.y, obs.y+130]
         if (
-            obs.y > 430 && obs.y < 540 && 
-            Math.abs(playerX - obs.x) < 70
+            obs.y > 350 && obs.y < 570 && // Rentang tabrakan Y disesuaikan agar pas
+            Math.abs(playerX - obs.x) < 90 // Berada di jalur yang sama
         ) {
             endGame();
         }
@@ -102,7 +109,8 @@ function endGame() {
 function resetGame() {
     score = 0;
     gameSpeed = 7;
-    playerX = 125;
+    // Reset playerX ke posisi tengah baru (110px)
+    playerX = 110; 
     isGameOver = false;
     spawnTimer = 0;
     
@@ -116,5 +124,5 @@ function resetGame() {
     gameLoop();
 }
 
-// Start
+// Start Game
 gameLoop();
