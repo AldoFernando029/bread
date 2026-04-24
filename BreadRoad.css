@@ -1,0 +1,86 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #2c3e50;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+}
+
+.game-info {
+    padding: 20px;
+}
+
+#game-container {
+    width: 800px;
+    height: 300px;
+    border: 5px solid #ecf0f1;
+    margin: 20px auto;
+    position: relative;
+    background-color: #34495e;
+    overflow: hidden;
+    border-radius: 10px;
+    /* LOGIKA JALAN BARU: Gunakan image_3.png sebagai jalan di bagian bawah */
+    background-image: url('Jalan.jpg');
+    background-repeat: repeat-x;
+    background-position: bottom 20% center;
+    background-size: contain;
+}
+
+#player, #obstacle {
+    width: 70px; /* Sedikit perbesar agar gambar terlihat jelas */
+    height: 70px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#player {
+    left: 50px;
+    top: 115px; /* Posisi awal tengah, disesuaikan dengan tinggi objek 70px */
+    transition: top 0.1s;
+}
+
+#obstacle {
+    right: -80px; /* Posisi awal luar */
+    top: 115px;
+}
+
+#player img, #obstacle img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#game-over {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 50px;
+    border-radius: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    background-color: #e67e22;
+    border: none;
+    color: white;
+    border-radius: 5px;
+}
+
+/* Membuat container menyesuaikan layar HP */
+@media (max-width: 800px) {
+    #game-container {
+        width: 95vw; /* Gunakan 95% lebar layar */
+        height: 250px; /* Sedikit lebih pendek di HP */
+    }
+}
