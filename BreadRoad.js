@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// FIREBASE CONFIG 
 const firebaseConfig = {
     apiKey: "AIzaSyDvQCFDvSnx7PGQG3KrHBpvooB_VGHbN1Q",
     authDomain: "breadroad-1357.firebaseapp.com",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// GLOBAL STATE 
 let score = 0;
 let playerX = 110; 
 let isGameOver = false;
@@ -30,7 +32,7 @@ const scoreElement = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
-// DATABASE
+//  DATABASE LOGIC 
 function getWeeklyId() {
     const now = new Date();
     const oneJan = new Date(now.getFullYear(), 0, 1);
@@ -47,11 +49,11 @@ window.submitScore = async function() {
     const finalScore = Math.floor(score);
 
     if (hasSubmitted) return; 
-    if (finalScore <= 0) return alert("Try again!");
+    if (finalScore <= 0) return alert("Please try again!");
 
     try {
         hasSubmitted = true; 
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Kirim..."; }
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Sending..."; }
 
         await addDoc(collection(db, getWeeklyId()), {
             name: name.substring(0, 10),
@@ -59,7 +61,7 @@ window.submitScore = async function() {
             timestamp: new Date()
         });
 
-        if (inputArea) inputArea.innerHTML = "<p style='color:#2ecc71; font-weight:bold;'>Skor Terkirim! ✅</p>";
+        if (inputArea) inputArea.innerHTML = "<p style='color:#2ecc71; font-weight:bold;'>Score Submitted! ✅</p>";
         loadLeaderboard(); 
     } catch (e) {
         hasSubmitted = false; 
@@ -87,9 +89,10 @@ async function loadLeaderboard() {
     } catch (e) { display.innerHTML = "<p>Gagal memuat skor.</p>"; }
 }
 
-// LOGIKA PERGERAKAN (OFFSET -25)
+//  GAME CONTROLS 
 function updatePlayerPosition() {
-    player.style.left = (playerX - 25) + 'px'; 
+    // (playerX - 25) menjadi (playerX - 10) agar lebih ke kanan
+    player.style.left = (playerX - 10) + 'px'; 
 }
 
 document.addEventListener('keydown', (e) => {
@@ -105,16 +108,20 @@ document.addEventListener('touchstart', (e) => {
     const touchX = e.touches[0].clientX;
     if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
     else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
-    updatePlayerPosition();
+    
+    // (playerX - 25) menjadi (playerX - 10) untuk touch
+    player.style.left = (playerX - 10) + 'px'; 
     e.preventDefault();
 }, { passive: false });
 
-// ENGINE
+// GAME ENGINE 
 function createObstacle() {
     const obsDiv = document.createElement('div');
     obsDiv.classList.add('obstacle');
     const laneX = lanes[Math.floor(Math.random() * lanes.length)];
-    obsDiv.style.left = (laneX - 15) + 'px'; 
+    
+    // (laneX - 15) menjadi (laneX) agar api juga sinkron ke kanan
+    obsDiv.style.left = laneX + 'px'; 
     obsDiv.style.top = '-150px';
     obsDiv.innerHTML = `<img src="Fire.png" alt="Fire">`;
     obstacleContainer.appendChild(obsDiv);
@@ -136,7 +143,10 @@ function gameLoop() {
     obstacles.forEach((obs, index) => {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
+        
+        // Deteksi Tabrakan (Hitbox roti 150px & api 130px)
         if (obs.y > 420 && obs.y < 560 && Math.abs(playerX - obs.x) < 55) endGame();
+        
         if (obs.y > 700) { obs.element.remove(); obstacles.splice(index, 1); }
     });
     animationId = requestAnimationFrame(gameLoop);
@@ -154,6 +164,8 @@ window.resetGame = function() {
     location.reload(); 
 };
 
-updatePlayerPosition();
+// START 
+// Gunakan -10 saat inisialisasi awal
+player.style.left = (playerX - 10) + 'px'; 
 loadLeaderboard();
 gameLoop();
