@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// FIREBASE CONFIG 
 const firebaseConfig = {
     apiKey: "AIzaSyDvQCFDvSnx7PGQG3KrHBpvooB_VGHbN1Q",
     authDomain: "breadroad-1357.firebaseapp.com",
@@ -15,7 +14,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// GLOBAL STATE 
 let score = 0;
 let playerX = 110; 
 let isGameOver = false;
@@ -32,7 +30,6 @@ const scoreElement = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
-//  DATABASE LOGIC 
 function getWeeklyId() {
     const now = new Date();
     const oneJan = new Date(now.getFullYear(), 0, 1);
@@ -54,13 +51,11 @@ window.submitScore = async function() {
     try {
         hasSubmitted = true; 
         if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Sending..."; }
-
         await addDoc(collection(db, getWeeklyId()), {
             name: name.substring(0, 10),
             score: finalScore,
             timestamp: new Date()
         });
-
         if (inputArea) inputArea.innerHTML = "<p style='color:#2ecc71; font-weight:bold;'>Score Submitted! ✅</p>";
         loadLeaderboard(); 
     } catch (e) {
@@ -72,11 +67,9 @@ window.submitScore = async function() {
 async function loadLeaderboard() {
     const display = document.getElementById('leaderboard-display');
     if (!display) return; 
-
     try {
         const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
-        
         let html = `<h4 style="color: #f39c12; text-align: center; margin: 10px 0;">🏆 TOP 10 MASTERS</h4><ul style="list-style:none; padding:0;">`;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
@@ -89,9 +82,8 @@ async function loadLeaderboard() {
     } catch (e) { display.innerHTML = "<p>Gagal memuat skor.</p>"; }
 }
 
-//  GAME CONTROLS 
+// POSISI SIMETRIS (Offset -10)
 function updatePlayerPosition() {
-    // (playerX - 25) menjadi (playerX - 10) agar lebih ke kanan
     player.style.left = (playerX - 10) + 'px'; 
 }
 
@@ -108,20 +100,15 @@ document.addEventListener('touchstart', (e) => {
     const touchX = e.touches[0].clientX;
     if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
     else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
-    
-    // (playerX - 25) menjadi (playerX - 10) untuk touch
     player.style.left = (playerX - 10) + 'px'; 
     e.preventDefault();
 }, { passive: false });
 
-// GAME ENGINE 
 function createObstacle() {
     const obsDiv = document.createElement('div');
     obsDiv.classList.add('obstacle');
     const laneX = lanes[Math.floor(Math.random() * lanes.length)];
-    
-    // (laneX - 15) menjadi (laneX) agar api juga sinkron ke kanan
-    obsDiv.style.left = laneX + 'px'; 
+    obsDiv.style.left = laneX + 'px'; // API SEJAJAR JALUR
     obsDiv.style.top = '-150px';
     obsDiv.innerHTML = `<img src="Fire.png" alt="Fire">`;
     obstacleContainer.appendChild(obsDiv);
@@ -144,8 +131,12 @@ function gameLoop() {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
         
-        // Deteksi Tabrakan (Hitbox roti 150px & api 130px)
-        if (obs.y > 420 && obs.y < 560 && Math.abs(playerX - obs.x) < 55) endGame();
+        // --- HITBOX REVISION (LEBIH ADIL) ---
+        // Range Y diciutkan agar tidak kena "belakang" api
+        // Jarak X diciutkan dari 55 ke 40 agar pixel-perfect
+        if (obs.y > 440 && obs.y < 520 && Math.abs(playerX - obs.x) < 40) {
+            endGame();
+        }
         
         if (obs.y > 700) { obs.element.remove(); obstacles.splice(index, 1); }
     });
@@ -160,12 +151,9 @@ function endGame() {
     loadLeaderboard(); 
 }
 
-window.resetGame = function() {
-    location.reload(); 
-};
+window.resetGame = function() { location.reload(); };
 
-// START 
-// Gunakan -10 saat inisialisasi awal
+// START
 player.style.left = (playerX - 10) + 'px'; 
 loadLeaderboard();
 gameLoop();

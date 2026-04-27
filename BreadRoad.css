@@ -1,24 +1,24 @@
-/* DASAR (FIT TO SCREEN) */
+/* DASAR (FIT SCREEN) */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ffffff; /* Latar luar putih */
+    background-color: #ffffff;
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-/* HEADER COMPACT (ORANGE BACKGROUND) */
+/* HEADER COMPACT (TENGAH SEMUA)  */
 .game-info {
     padding: 10px;
-    background-color: #f39c12; /* Oren Roti */
-    color: #ffffff; /* Teks Putih */
+    background-color: #f39c12; 
+    color: #ffffff; 
     flex-shrink: 0;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     z-index: 20;
-    text-align: center; 
+    text-align: center; /* KUNCI SEMUA KE TENGAH */
 }
 
 .game-info h1 {
@@ -43,16 +43,16 @@ body {
     margin-top: 5px;
 }
 
-/* CONTAINER GAME */
+/* CONTAINER GAME (THICK BORDER) */
 #game-container {
     width: 350px;
-    flex-grow: 1; /* Ngisi sisa layar */
+    flex-grow: 1;
     max-height: 72vh;
     margin: 10px auto;
     position: relative;
     overflow: hidden;
     border-radius: 20px;
-    border: 12px solid #f39c12; /* Border tebal oren */
+    border: 12px solid #f39c12;
     background-color: #ffffff;
 }
 
@@ -78,7 +78,7 @@ body {
 
 /* PLAYER & OBSTACLE SPRITES */
 #player {
-    width: 150px; /* Roti Besar */
+    width: 150px;
     height: 150px;
     position: absolute;
     bottom: 20px;
@@ -88,7 +88,7 @@ body {
 }
 
 .obstacle {
-    width: 130px; /* Api Besar */
+    width: 130px;
     height: 130px;
     position: absolute;
     z-index: 5;
@@ -109,7 +109,7 @@ body {
     background: white;
     padding: 25px;
     border-radius: 20px;
-    border: 4px solid #f39c12;
+    border: 5px solid #f39c12;
     z-index: 100;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     min-width: 280px;
