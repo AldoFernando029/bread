@@ -8,6 +8,30 @@
     overflow: hidden;
 }
 
+/* Pastikan warna skor akhir putih */
+#final-score {
+    color: white !important; /* Gunakan important agar tidak tertimpa style lain */
+    font-weight: bold;
+}
+
+/* Ukuran Roti tetap 160px */
+#player {
+    width: 160px;
+    height: 160px;
+    position: absolute;
+    bottom: 30px;
+    transition: left 0.12s ease-out;
+    z-index: 5;
+}
+
+/* Ukuran Api tetap 130px */
+.obstacle {
+    width: 130px;
+    height: 130px;
+    position: absolute;
+    z-index: 4;
+}
+
 .game-info {
     padding: 10px;
     background: rgba(0, 0, 0, 0.3);
@@ -39,7 +63,6 @@
     height: 160px;
     position: absolute;
     bottom: 30px;
-    left: 110px; /* Tengah */
     transition: left 0.12s ease-out;
     z-index: 5;
 }
@@ -49,9 +72,6 @@
     width: 130px;
     height: 130px;
     position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 4;
 }
 

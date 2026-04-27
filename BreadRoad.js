@@ -26,7 +26,7 @@ document.addEventListener('keydown', (e) => {
     // Gunakan boundary (batas) jalur baru: 10 dan 210
     if ((key === 'arrowleft' || key === 'a') && playerX > 10) playerX -= 100;
     if ((key === 'arrowright' || key === 'd') && playerX < 210) playerX += 100;
-    player.style.left = playerX + 'px';
+    player.style.left = (playerX - 15) + 'px';
 });
 
 // 2. KONTROL (MOBILE)
@@ -36,7 +36,7 @@ document.addEventListener('touchstart', (e) => {
     // Gunakan boundary baru
     if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
     else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
-    player.style.left = playerX + 'px';
+    player.style.left = (playerX - 15) + 'px'; 
     e.preventDefault();
 }, { passive: false });
 
@@ -81,9 +81,10 @@ function gameLoop() {
         obs.element.style.top = obs.y + 'px';
 
     const hitboxPadding = 25; // Memberi ruang aman 25px
+    // Di dalam gameLoop, bagian deteksi tabrakan:
     if (
-        obs.y > 450 && obs.y < 560 && // Menyesuaikan area kontak vertikal
-        Math.abs(playerX - obs.x) < 65 // Dipersempit agar tidak gampang senggolan
+        obs.y > 440 && obs.y < 560 && // Menyesuaikan area kontak vertikal Roti (bottom 30px)
+        Math.abs(playerX - obs.x) < 50 // Karena sudah simetris, angka ini lebih akurat
     ) {
         endGame();
     }
@@ -101,7 +102,7 @@ function gameLoop() {
 function endGame() {
     isGameOver = true;
     cancelAnimationFrame(animationId);
-    finalScoreText.innerText = `Skor Akhir Kamu: ${Math.floor(score)}`;
+    finalScoreText.innerText = `Your Final Score: ${Math.floor(score)}`;
     gameOverScreen.classList.remove('hidden');
 }
 
@@ -119,7 +120,7 @@ function resetGame() {
     
     scoreElement.innerText = `Score: 0`;
     gameOverScreen.classList.add('hidden');
-    player.style.left = playerX + 'px';
+    player.style.left = (playerX - 15) + 'px'; 
     gameLoop();
 }
 
