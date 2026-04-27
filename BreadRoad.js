@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// VARIABEL GLOBAL 
+// VARIABEL GLOBAL GAME 
 let score = 0;
 let playerX = 110; 
 let isGameOver = false;
@@ -32,7 +32,7 @@ const scoreElement = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
-//  LOGIKA FIREBOARD (DATABASE) 
+// LOGIKA DATABASE (LEADERBOARD)
 
 function getWeeklyId() {
     const now = new Date();
@@ -69,7 +69,7 @@ window.submitScore = async function() {
 
         const successMsg = document.createElement('p');
         successMsg.id = "success-msg";
-        successMsg.innerHTML = "Score submitted!";
+        successMsg.innerHTML = "Score submitted! ✅";
         successMsg.style.color = "#2ecc71";
         successMsg.style.fontWeight = "bold";
         nameInput.parentNode.insertBefore(successMsg, nameInput);
@@ -93,13 +93,13 @@ async function loadLeaderboard() {
         const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
         
-        let html = `<h4 style="color: #f39c12; text-align: center; margin-top: 20px;">🏆 Top 10 Bread Masters</h4>`;
+        let html = `<h4 style="color: #f39c12; text-align: center; margin-top: 15px;">🏆 Top 10 Bread Masters</h4>`;
         html += `<ul style="list-style: none; padding: 0; margin: 10px auto; max-width: 250px;">`;
         
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             html += `
-                <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.1); color: #333; font-family: sans-serif;">
+                <li style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.1); color: #333; font-size: 14px;">
                     <span style="font-weight: bold;">${data.name}</span>
                     <span style="color: #f39c12; font-weight: bold;">${data.score} pts</span>
                 </li>`;
@@ -112,14 +112,19 @@ async function loadLeaderboard() {
     }
 }
 
-// LOGIKA GAMEPLAY 
+// KONTROL PERGERAKAN
+
+function updatePlayerPosition() {
+    // Offset -10 agar Roti 120px pas di tengah jalur (Lane 110)
+    player.style.left = (playerX - 10) + 'px'; 
+}
 
 document.addEventListener('keydown', (e) => {
     if (isGameOver) return;
     const key = e.key.toLowerCase();
     if ((key === 'arrowleft' || key === 'a') && playerX > 10) playerX -= 100;
     if ((key === 'arrowright' || key === 'd') && playerX < 210) playerX += 100;
-    player.style.left = (playerX - 10) + 'px'; 
+    updatePlayerPosition();
 });
 
 document.addEventListener('touchstart', (e) => {
@@ -127,9 +132,11 @@ document.addEventListener('touchstart', (e) => {
     const touchX = e.touches[0].clientX;
     if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
     else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
-    player.style.left = (playerX - 10) + 'px'; 
+    updatePlayerPosition();
     e.preventDefault();
 }, { passive: false });
+
+// INTI PERMAINAN (LOOP) 
 
 function createObstacle() {
     const obsDiv = document.createElement('div');
@@ -144,15 +151,18 @@ function createObstacle() {
 
 function gameLoop() {
     if (isGameOver) return;
-    score += 0.2; 
+    
+    score += 0.15; // Kecepatan penambahan skor disesuaikan
     scoreElement.innerText = `Score: ${Math.floor(score)}`;
     
-    if (Math.floor(score) > 0 && Math.floor(score) % 100 === 0 && gameSpeed < 15) {
-        gameSpeed += 0.2;
+    // Peningkatan kecepatan bertahap
+    if (Math.floor(score) > 0 && Math.floor(score) % 150 === 0 && gameSpeed < 18) {
+        gameSpeed += 0.05;
     }
 
     spawnTimer++;
-    let currentSpawnInterval = Math.max(45, 90 - Math.floor(score / 20));
+    // Interval spawn dinamis agar tidak terlalu tumpang tindih
+    let currentSpawnInterval = Math.max(40, 85 - Math.floor(score / 25));
     
     if (spawnTimer > currentSpawnInterval) {
         obstacles.push(createObstacle());
@@ -162,28 +172,34 @@ function gameLoop() {
     obstacles.forEach((obs, index) => {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
-        if (obs.y > 440 && obs.y < 560 && Math.abs(playerX - obs.x) < 50) {
+
+        // Deteksi Tabrakan (Hitbox disesuaikan)
+        if (obs.y > 420 && obs.y < 540 && Math.abs(playerX - obs.x) < 45) {
             endGame();
         }
+
+        // Hapus obstacle yang lewat
         if (obs.y > 650) {
             obs.element.remove();
             obstacles.splice(index, 1);
         }
     });
+    
     animationId = requestAnimationFrame(gameLoop);
 }
 
-// TRANSISI STATE 
+// STATE TRANSITION (END & RESET) 
 
 function endGame() {
     isGameOver = true;
     cancelAnimationFrame(animationId);
-    finalScoreText.innerText = `Your Final Score: ${Math.floor(score)}`;
+    finalScoreText.innerText = `Final Score: ${Math.floor(score)}`;
     gameOverScreen.classList.remove('hidden');
     loadLeaderboard(); 
 }
 
 window.resetGame = function() {
+    // Reset Data
     score = 0;
     gameSpeed = 7;
     playerX = 110; 
@@ -191,6 +207,7 @@ window.resetGame = function() {
     hasSubmitted = false; 
     spawnTimer = 0;
     
+    // Reset UI
     const nameInput = document.getElementById('nickname');
     const submitBtn = document.querySelector('button[onclick="submitScore()"]');
     const successMsg = document.getElementById('success-msg');
@@ -202,18 +219,21 @@ window.resetGame = function() {
     if (submitBtn) {
         submitBtn.style.display = 'inline-block';
         submitBtn.disabled = false;
-        submitBtn.innerText = "Kirim Skor";
+        submitBtn.innerText = "Submit Score";
     }
     if (successMsg) successMsg.remove();
 
+    // Bersihkan Obstacle
     obstacles.forEach(obs => obs.element.remove());
     obstacles = [];
+    
     scoreElement.innerText = `Score: 0`;
     gameOverScreen.classList.add('hidden');
-    player.style.left = (playerX - 10) + 'px'; 
+    updatePlayerPosition();
     gameLoop();
 };
 
-// EKSEKUSI AWAL
+// START
+updatePlayerPosition();
 loadLeaderboard();
 gameLoop();
