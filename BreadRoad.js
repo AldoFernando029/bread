@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// VARIABEL GLOBAL GAME 
+// VARIABEL GLOBAL
 let score = 0;
 let playerX = 110; 
 let isGameOver = false;
@@ -32,8 +32,7 @@ const scoreElement = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
-// LOGIKA DATABASE (LEADERBOARD)
-
+// LOGIKA FIREBASE 
 function getWeeklyId() {
     const now = new Date();
     const oneJan = new Date(now.getFullYear(), 0, 1);
@@ -49,13 +48,13 @@ window.submitScore = async function() {
     const finalScore = Math.floor(score);
 
     if (hasSubmitted) return; 
-    if (finalScore <= 0) return alert("Please Try again!");
+    if (finalScore <= 0) return alert("Coba main lagi, Do!");
 
     try {
         hasSubmitted = true; 
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = "Sending...";
+            submitBtn.innerText = "Kirim...";
         }
 
         await addDoc(collection(db, getWeeklyId()), {
@@ -69,7 +68,7 @@ window.submitScore = async function() {
 
         const successMsg = document.createElement('p');
         successMsg.id = "success-msg";
-        successMsg.innerHTML = "Score submitted! ✅";
+        successMsg.innerHTML = "Score Submitted! ✅";
         successMsg.style.color = "#2ecc71";
         successMsg.style.fontWeight = "bold";
         nameInput.parentNode.insertBefore(successMsg, nameInput);
@@ -81,7 +80,6 @@ window.submitScore = async function() {
             submitBtn.disabled = false;
             submitBtn.innerText = "Submit Score";
         }
-        console.error("Error: ", e);
     }
 };
 
@@ -93,8 +91,8 @@ async function loadLeaderboard() {
         const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
         
-        let html = `<h4 style="color: #f39c12; text-align: center; margin-top: 15px;">🏆 Top 10 Bread Masters</h4>`;
-        html += `<ul style="list-style: none; padding: 0; margin: 10px auto; max-width: 250px;">`;
+        let html = `<h4 style="color: #f39c12; text-align: center;">🏆 TOP 10 MASTERS</h4>`;
+        html += `<ul style="list-style: none; padding: 0;">`;
         
         querySnapshot.forEach((doc) => {
             const data = doc.data();
@@ -108,15 +106,14 @@ async function loadLeaderboard() {
         html += "</ul>";
         display.innerHTML = html;
     } catch (e) {
-        display.innerHTML = "<p>Gagal memuat skor.</p>";
+        display.innerHTML = "<p>Gagal memuat leaderboard.</p>";
     }
 }
 
-// KONTROL PERGERAKAN
-
+// KONTROL PERGERAKAN (OFFSET -25)
 function updatePlayerPosition() {
-    // Offset -10 agar Roti 120px pas di tengah jalur (Lane 110)
-    player.style.left = (playerX - 10) + 'px'; 
+    // Offset -25 agar Roti 150px pas di tengah jalur
+    player.style.left = (playerX - 25) + 'px'; 
 }
 
 document.addEventListener('keydown', (e) => {
@@ -136,13 +133,13 @@ document.addEventListener('touchstart', (e) => {
     e.preventDefault();
 }, { passive: false });
 
-// INTI PERMAINAN (LOOP) 
-
+// GAME ENGINE 
 function createObstacle() {
     const obsDiv = document.createElement('div');
     obsDiv.classList.add('obstacle');
     const laneX = lanes[Math.floor(Math.random() * lanes.length)];
-    obsDiv.style.left = laneX + 'px';
+    // Offset -15 agar Api 130px pas di tengah jalur
+    obsDiv.style.left = (laneX - 15) + 'px'; 
     obsDiv.style.top = '-150px';
     obsDiv.innerHTML = `<img src="Fire.png" alt="Fire">`;
     obstacleContainer.appendChild(obsDiv);
@@ -152,17 +149,15 @@ function createObstacle() {
 function gameLoop() {
     if (isGameOver) return;
     
-    score += 0.15; // Kecepatan penambahan skor disesuaikan
+    score += 0.15;
     scoreElement.innerText = `Score: ${Math.floor(score)}`;
     
-    // Peningkatan kecepatan bertahap
     if (Math.floor(score) > 0 && Math.floor(score) % 150 === 0 && gameSpeed < 18) {
-        gameSpeed += 0.05;
+        gameSpeed += 0.1;
     }
 
     spawnTimer++;
-    // Interval spawn dinamis agar tidak terlalu tumpang tindih
-    let currentSpawnInterval = Math.max(40, 85 - Math.floor(score / 25));
+    let currentSpawnInterval = Math.max(40, 85 - Math.floor(score / 30));
     
     if (spawnTimer > currentSpawnInterval) {
         obstacles.push(createObstacle());
@@ -173,13 +168,12 @@ function gameLoop() {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
 
-        // Deteksi Tabrakan (Hitbox disesuaikan)
-        if (obs.y > 420 && obs.y < 540 && Math.abs(playerX - obs.x) < 45) {
+        // Hitbox Collision (Hitbox roti 150px & api 130px)
+        if (obs.y > 420 && obs.y < 560 && Math.abs(playerX - obs.x) < 55) {
             endGame();
         }
 
-        // Hapus obstacle yang lewat
-        if (obs.y > 650) {
+        if (obs.y > 700) {
             obs.element.remove();
             obstacles.splice(index, 1);
         }
@@ -188,8 +182,7 @@ function gameLoop() {
     animationId = requestAnimationFrame(gameLoop);
 }
 
-// STATE TRANSITION (END & RESET) 
-
+// TRANSISI STATE 
 function endGame() {
     isGameOver = true;
     cancelAnimationFrame(animationId);
@@ -199,7 +192,6 @@ function endGame() {
 }
 
 window.resetGame = function() {
-    // Reset Data
     score = 0;
     gameSpeed = 7;
     playerX = 110; 
@@ -207,7 +199,6 @@ window.resetGame = function() {
     hasSubmitted = false; 
     spawnTimer = 0;
     
-    // Reset UI
     const nameInput = document.getElementById('nickname');
     const submitBtn = document.querySelector('button[onclick="submitScore()"]');
     const successMsg = document.getElementById('success-msg');
@@ -219,11 +210,10 @@ window.resetGame = function() {
     if (submitBtn) {
         submitBtn.style.display = 'inline-block';
         submitBtn.disabled = false;
-        submitBtn.innerText = "Submit Score";
+        submitBtn.innerText = "Kirim Skor";
     }
     if (successMsg) successMsg.remove();
 
-    // Bersihkan Obstacle
     obstacles.forEach(obs => obs.element.remove());
     obstacles = [];
     
@@ -233,7 +223,7 @@ window.resetGame = function() {
     gameLoop();
 };
 
-// START
+// START 
 updatePlayerPosition();
 loadLeaderboard();
 gameLoop();
