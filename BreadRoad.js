@@ -14,7 +14,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// LOGIKA FIREBASE 
+// VARIABEL GLOBAL GAME 
+let score = 0;
+let playerX = 110; 
+let isGameOver = false;
+let hasSubmitted = false; //Mencegah submit berkali-kali
+let gameSpeed = 7; 
+let animationId;
+let obstacles = []; 
+let spawnTimer = 0;
+const lanes = [10, 110, 210]; 
+
+const player = document.getElementById('player');
+const obstacleContainer = document.getElementById('obstacle-container');
+const scoreElement = document.getElementById('score');
+const gameOverScreen = document.getElementById('game-over');
+const finalScoreText = document.getElementById('final-score');
+
+// LOGIKA FIREBASE (LEADERBOARD)
 
 function getWeeklyId() {
     const now = new Date();
@@ -26,21 +43,36 @@ function getWeeklyId() {
 
 window.submitScore = async function() {
     const nameInput = document.getElementById('nickname');
+    const submitBtn = document.querySelector('#game-over button[onclick="submitScore()"]');
     const name = nameInput.value.trim() || "Roti Misterius";
     const finalScore = Math.floor(score);
 
-    if (finalScore <= 0) return alert("Main dulu baru kirim skor, Do! wkwk");
+    // Proteksi: Jika sudah kirim atau skor 0, jangan jalan
+    if (hasSubmitted) return; 
+    if (finalScore <= 0) return alert("Please Try again!");
 
     try {
+        hasSubmitted = true; // Kunci akses
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Mengirim...";
+        }
+
         await addDoc(collection(db, getWeeklyId()), {
             name: name.substring(0, 10),
             score: finalScore,
             timestamp: new Date()
         });
+
         alert("Skor Berhasil Dikirim!");
-        nameInput.value = ""; 
+        if (submitBtn) submitBtn.innerText = "Terkirim! ✅";
         loadLeaderboard(); 
     } catch (e) {
+        hasSubmitted = false; // Buka kunci jika gagal agar bisa coba lagi
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Kirim Skor";
+        }
         console.error("Gagal kirim skor: ", e);
     }
 };
@@ -53,22 +85,13 @@ async function loadLeaderboard() {
         const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
         
-        // Styling Judul Leaderboard
         let html = `<h4 style="color: #f1c40f; text-align: center; margin-top: 20px; text-transform: uppercase;">🏆 Top 10 Bread Masters</h4>`;
         html += `<ul style="list-style: none; padding: 0; margin: 10px auto; max-width: 250px;">`;
         
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            // Styling tiap baris: Nama Putih, Skor Emas, Ada garis bawah tipis
             html += `
-                <li style="
-                    display: flex; 
-                    justify-content: space-between; 
-                    padding: 8px 0; 
-                    border-bottom: 1px solid rgba(255,255,255,0.1); 
-                    color: white; 
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                ">
+                <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); color: white; font-family: sans-serif;">
                     <span style="font-weight: bold;">${data.name}</span>
                     <span style="color: #f1c40f; font-weight: bold;">${data.score} pts</span>
                 </li>`;
@@ -78,26 +101,10 @@ async function loadLeaderboard() {
         display.innerHTML = html;
     } catch (e) {
         display.innerHTML = "<p style='color: white;'>Gagal memuat skor.</p>";
-        console.error(e);
     }
 }
 
-// LOGIKA GAME 
-
-const player = document.getElementById('player');
-const obstacleContainer = document.getElementById('obstacle-container');
-const scoreElement = document.getElementById('score');
-const gameOverScreen = document.getElementById('game-over');
-const finalScoreText = document.getElementById('final-score');
-
-let score = 0;
-let playerX = 110; 
-let isGameOver = false;
-let gameSpeed = 7; 
-let animationId;
-let obstacles = []; 
-let spawnTimer = 0;
-const lanes = [10, 110, 210]; 
+// LOGIKA INTI GAME
 
 document.addEventListener('keydown', (e) => {
     if (isGameOver) return;
@@ -147,11 +154,9 @@ function gameLoop() {
     obstacles.forEach((obs, index) => {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
-
         if (obs.y > 440 && obs.y < 560 && Math.abs(playerX - obs.x) < 50) {
             endGame();
         }
-
         if (obs.y > 650) {
             obs.element.remove();
             obstacles.splice(index, 1);
@@ -173,7 +178,16 @@ window.resetGame = function() {
     gameSpeed = 7;
     playerX = 110; 
     isGameOver = false;
+    hasSubmitted = false; // Reset agar bisa submit di game baru
     spawnTimer = 0;
+    
+    // Reset Tombol
+    const submitBtn = document.querySelector('#game-over button[onclick="submitScore()"]');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Kirim Skor";
+    }
+
     obstacles.forEach(obs => obs.element.remove());
     obstacles = [];
     scoreElement.innerText = `Score: 0`;
