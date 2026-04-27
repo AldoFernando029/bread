@@ -10,21 +10,21 @@ body {
     overflow: hidden;
 }
 
-/* HEADER */
+/* HEADER COMPACT (TENGAH SEMUA) */
 .game-info {
-    padding: 12px 10px;
-    background-color: #f39c12;
-    color: white;
+    padding: 10px;
+    background-color: #f39c12; 
+    color: #ffffff; 
     flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     z-index: 20;
+    text-align: center; 
 }
 
-.game-info h1 {
-    margin: 0;
-    font-size: 26px;
-    font-weight: 800;
-    text-transform: none; 
+/* Pastikan elemen h1 dan p tidak punya margin kiri-kanan yang aneh */
+.game-info h1, .game-info p {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #score {
