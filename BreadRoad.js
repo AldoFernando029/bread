@@ -63,12 +63,12 @@ function gameLoop() {
     scoreElement.innerText = `Score: ${Math.floor(score)}`;
     
     // Difficulty scaling (Phase makin cepat)
-    if (Math.floor(score) > 0 && Math.floor(score) % 50 === 0) {
-        gameSpeed += 0.005; 
+    if (Math.floor(score) > 0 && Math.floor(score) % 100 === 0 && gameSpeed < 15) {
+        gameSpeed += 0.2; // Tambah 0.2 setiap 100 poin
     }
 
     spawnTimer++;
-    let currentSpawnInterval = Math.max(25, 80 - Math.floor(score / 15));
+    let currentSpawnInterval = Math.max(45, 90 - Math.floor(score / 20));
     
     if (spawnTimer > currentSpawnInterval) {
         obstacles.push(createObstacle());
@@ -80,14 +80,13 @@ function gameLoop() {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
 
-        // Deteksi Tabrakan (Hitbox baru disesuaikan untuk 130px)
-        // Roti menempati Y [440, 570]. Api menempati Y [obs.y, obs.y+130]
-        if (
-            obs.y > 350 && obs.y < 570 && // Rentang tabrakan Y disesuaikan agar pas
-            Math.abs(playerX - obs.x) < 90 // Berada di jalur yang sama
-        ) {
-            endGame();
-        }
+    const hitboxPadding = 25; // Memberi ruang aman 25px
+    if (
+        obs.y > 450 && obs.y < 560 && // Menyesuaikan area kontak vertikal
+        Math.abs(playerX - obs.x) < 65 // Dipersempit agar tidak gampang senggolan
+    ) {
+        endGame();
+    }
 
         // Hapus api yang lolos
         if (obs.y > 650) {
