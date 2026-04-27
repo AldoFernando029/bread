@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://breadroad.my.id/sitemap.xml
+Sitemap: https://www.breadroad.my.id/sitemap.xml
