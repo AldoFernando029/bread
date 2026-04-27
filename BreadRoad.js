@@ -1,4 +1,72 @@
-/* eslint-env browser */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDvQCFDvSnx7PGQG3KrHBpvooB_VGHbN1Q",
+  authDomain: "breadroad-1357.firebaseapp.com",
+  projectId: "breadroad-1357",
+  storageBucket: "breadroad-1357.firebasestorage.app",
+  messagingSenderId: "702639811777",
+  appId: "1:702639811777:web:62432ab7e4b6dc554b7840",
+  measurementId: "G-SD7NQY6ZG3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// LOGIKA FIREBASE
+
+function getWeeklyId() {
+    const now = new Date();
+    const oneJan = new Date(now.getFullYear(), 0, 1);
+    const numberOfDays = Math.floor((now - oneJan) / (24 * 60 * 60 * 1000));
+    const weekNumber = Math.ceil((now.getDay() + 1 + numberOfDays) / 7);
+    return `leaderboard_week_${weekNumber}_${now.getFullYear()}`;
+}
+
+window.submitScore = async function() {
+    const nameInput = document.getElementById('nickname');
+    const name = nameInput.value.trim() || "Roti Misterius";
+    const finalScore = Math.floor(score);
+
+    try {
+        await addDoc(collection(db, getWeeklyId()), {
+            name: name.substring(0, 10),
+            score: finalScore,
+            timestamp: new Date()
+        });
+        alert("Skor Berhasil Dikirim!");
+        nameInput.value = ""; // Bersihkan input setelah kirim
+        loadLeaderboard(); 
+    } catch (e) {
+        console.error("Gagal kirim skor: ", e);
+    }
+};
+
+async function loadLeaderboard() {
+    const display = document.getElementById('leaderboard-display');
+    if (!display) return; // Safety check
+    try {
+        const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
+        const querySnapshot = await getDocs(q);
+        
+        let html = "<h4>🏆 Top 10 Bread Masters</h4><ul style='list-style: none; padding: 0;'>";
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            html += `<li style="border-bottom: 1px solid #eee; padding: 5px 0; display: flex; justify-content: space-between;">
+                        <span><b>${data.name}</b></span>
+                        <span>${data.score} pts</span>
+                     </li>`;
+        });
+        html += "</ul>";
+        display.innerHTML = html;
+    } catch (e) {
+        display.innerHTML = "<p>Gagal memuat skor.</p>";
+        console.error(e);
+    }
+}
+
+// LOGIKA GAME 
 
 const player = document.getElementById('player');
 const obstacleContainer = document.getElementById('obstacle-container');
@@ -7,64 +75,49 @@ const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
 let score = 0;
-// playerX disesuaikan dengan posisi tengah baru (110px)
 let playerX = 110; 
 let isGameOver = false;
 let gameSpeed = 7; 
 let animationId;
 let obstacles = []; 
 let spawnTimer = 0;
-
-// Jalur jalan baru disesuaikan untuk objek ukuran 130px
-// [Kiri, Tengah, Kanan] agar muat di container 350px
 const lanes = [10, 110, 210]; 
 
-// 1. KONTROL (PC)
 document.addEventListener('keydown', (e) => {
     if (isGameOver) return;
     const key = e.key.toLowerCase();
-    // Gunakan boundary (batas) jalur baru: 10 dan 210
     if ((key === 'arrowleft' || key === 'a') && playerX > 10) playerX -= 100;
     if ((key === 'arrowright' || key === 'd') && playerX < 210) playerX += 100;
     player.style.left = (playerX - 15) + 'px';
 });
 
-// 2. KONTROL (MOBILE)
 document.addEventListener('touchstart', (e) => {
     if (isGameOver) return;
     const touchX = e.touches[0].clientX;
-    // Gunakan boundary baru
     if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
     else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
     player.style.left = (playerX - 15) + 'px'; 
     e.preventDefault();
 }, { passive: false });
 
-// Fungsi Membuat Api
 function createObstacle() {
     const obsDiv = document.createElement('div');
     obsDiv.classList.add('obstacle');
     const laneX = lanes[Math.floor(Math.random() * lanes.length)];
-    
     obsDiv.style.left = laneX + 'px';
-    // Mulai dari lebih tinggi karena ukuran objek lebih besar (-150px)
     obsDiv.style.top = '-150px';
     obsDiv.innerHTML = `<img src="Fire.png" alt="Fire">`;
-    
     obstacleContainer.appendChild(obsDiv);
     return { element: obsDiv, y: -150, x: laneX };
 }
 
 function gameLoop() {
     if (isGameOver) return;
-
-    // Skor bertambah
     score += 0.2; 
     scoreElement.innerText = `Score: ${Math.floor(score)}`;
     
-    // Difficulty scaling (Phase makin cepat)
     if (Math.floor(score) > 0 && Math.floor(score) % 100 === 0 && gameSpeed < 15) {
-        gameSpeed += 0.2; // Tambah 0.2 setiap 100 poin
+        gameSpeed += 0.2;
     }
 
     spawnTimer++;
@@ -75,27 +128,19 @@ function gameLoop() {
         spawnTimer = 0;
     }
 
-    // Pergerakan & Tabrakan
     obstacles.forEach((obs, index) => {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
 
-    const hitboxPadding = 25; // Memberi ruang aman 25px
-    // Di dalam gameLoop, bagian deteksi tabrakan:
-    if (
-        obs.y > 440 && obs.y < 560 && // Menyesuaikan area kontak vertikal Roti (bottom 30px)
-        Math.abs(playerX - obs.x) < 50 // Karena sudah simetris, angka ini lebih akurat
-    ) {
-        endGame();
-    }
+        if (obs.y > 440 && obs.y < 560 && Math.abs(playerX - obs.x) < 50) {
+            endGame();
+        }
 
-        // Hapus api yang lolos
         if (obs.y > 650) {
             obs.element.remove();
             obstacles.splice(index, 1);
         }
     });
-
     animationId = requestAnimationFrame(gameLoop);
 }
 
@@ -104,25 +149,23 @@ function endGame() {
     cancelAnimationFrame(animationId);
     finalScoreText.innerText = `Your Final Score: ${Math.floor(score)}`;
     gameOverScreen.classList.remove('hidden');
+    loadLeaderboard(); // PENTING: Memuat skor orang lain saat kalah
 }
 
-function resetGame() {
+window.resetGame = function() {
     score = 0;
     gameSpeed = 7;
-    // Reset playerX ke posisi tengah baru (110px)
     playerX = 110; 
     isGameOver = false;
     spawnTimer = 0;
-    
-    // Hapus semua api lama
     obstacles.forEach(obs => obs.element.remove());
     obstacles = [];
-    
     scoreElement.innerText = `Score: 0`;
     gameOverScreen.classList.add('hidden');
     player.style.left = (playerX - 15) + 'px'; 
     gameLoop();
-}
+};
 
-// Start Game
+// Start 
+loadLeaderboard();
 gameLoop();

@@ -20,12 +20,19 @@
         <div id="player"><img src="Roti.png" alt="Bread"></div>
     </div>
 
-    <div id="game-over" class="hidden">
+<div id="game-over" class="hidden">
         <h2 style="color: #e74c3c; font-size: 40px;">You lose! 🍞🔥</h2>
         <p id="final-score" style="font-size: 20px;"></p>
+        <input type="text" id="nickname" placeholder="Masukkan Nickname (Maks 10 huruf)">
+        <button onclick="submitScore()">Kirim Skor</button>
         <button onclick="resetGame()">Try again!</button>
+        
+        <hr>
+        <div id="leaderboard-display" style="margin-top: 20px; text-align: left;">
+            <p>Memuat Leaderboard...</p>
+        </div>
     </div>
 
-    <script src="BreadRoad.js"></script>
+    <script type="module" src="BreadRoad.js"></script>
 </body>
 </html>
