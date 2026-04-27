@@ -1,11 +1,9 @@
-/* DASAR (FIT TO SCREEN) */
+/* DASAR */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ffffff; /* Latar luar putih bersih */
-    color: #333;
-    text-align: center;
+    background-color: #ffffff;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -26,27 +24,16 @@ body {
     margin: 0;
     font-size: 26px;
     font-weight: 800;
-    color: #ffffff;
     text-transform: none; 
-    letter-spacing: 0.5px;
-}
-
-.game-info p {
-    font-size: 12px;
-    margin: 4px 0;
-    color: #ffffff;
-    font-weight: 500;
 }
 
 #score {
     font-size: 20px;
     font-weight: bold;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
     display: inline-block;
-    padding: 3px 20px;
+    padding: 2px 20px;
     border-radius: 8px;
-    border: 2px solid #ffffff;
     margin-top: 5px;
 }
 
@@ -59,22 +46,32 @@ body {
     position: relative;
     overflow: hidden;
     border-radius: 20px;
-    border: 12px solid #f39c12; /* Border tebal oren */
+    border: 12px solid #f39c12;
     background-color: #ffffff;
+}
+
+/* LOGIKA JALANAN (ANTI-STUTTER) */
+.road-bg {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 200%;
     background-image: url('Jalan.jpg');
     background-repeat: repeat-y;
-    background-size: 100% auto;
-    /* SPEED FIX: 1.2s biar gak tersendat */
-    animation: moveRoad 1.2s linear infinite;
-    will-change: background-position; 
+    background-size: 100% 50%;
+    z-index: 1;
+    /* Transform jauh lebih ringan daripada background-position */
+    animation: smoothRoad 1.2s linear infinite;
+    will-change: transform;
 }
 
-@keyframes moveRoad {
-    from { background-position-y: 0; }
-    to { background-position-y: 500px; } 
+@keyframes smoothRoad {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50%); }
 }
 
-/* Player & OBSTACLE */
+/* PLAYER & OBSTACLE  */
 #player {
     width: 150px;
     height: 150px;
@@ -98,7 +95,7 @@ body {
     object-fit: contain;
 }
 
-/* LEADERBOARD */
+/* Game Over */
 #game-over {
     position: fixed;
     top: 50%;
@@ -107,38 +104,11 @@ body {
     background: white;
     padding: 25px;
     border-radius: 20px;
-    border: 4px solid #f39c12;
+    border: 5px solid #f39c12;
     z-index: 100;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    min-width: 280px;
-}
-
-#final-score {
-    color: #f39c12 !important;
-    font-size: 22px;
-    font-weight: bold;
-}
-
-button {
-    padding: 10px 25px;
-    background: #f39c12;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    margin: 5px;
-}
-
-#leaderboard-display ul {
-    max-height: 150px;
-    overflow-y: auto;
-    padding: 0;
-    list-style: none;
 }
 
 .hidden { display: none; }
+button { padding: 10px 20px; background: #f39c12; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 5px; }
 
-@media (max-width: 450px) {
-    #game-container { width: 90vw; }
-}
+@media (max-width: 450px) { #game-container { width: 90vw; } }

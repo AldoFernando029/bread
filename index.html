@@ -5,35 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BreadRoad</title>
     <link rel="stylesheet" href="BreadRoad.css">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8285693505460058"
-     crossorigin="anonymous"></script>
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8285693505460058" crossorigin="anonymous"></script>
 </head>
 <body>
+
     <div class="game-info">
         <h1>BreadRoad</h1>
-        <p>Use <b>A / D</b> Or <b>Arrow Left/Right</b> to avoid!</p>
-        <p>For Mobile <b> Tap Left/Right</b> to avoid!</p>
+        <p>Use <b>A / D</b> or <b>Arrow Keys</b> | Mobile: <b>Tap Left/Right</b></p>
         <div id="score">Score: 0</div>
     </div>
 
     <div id="game-container">
+        <div class="road-bg"></div>
+        
         <div id="obstacle-container"></div>
-        <div id="player"><img src="Roti.png" alt="Bread"></div>
+        
+        <div id="player">
+            <img src="Roti.png" alt="Bread">
+        </div>
     </div>
 
-<div id="game-over" class="hidden">
-        <h2 style="color: #e74c3c; font-size: 40px;">You lose! 🍞🔥</h2>
-        <p id="final-score" style="font-size: 20px;"></p>
-        <input type="text" id="nickname" placeholder="Insert Nickname (Maks 10 words)">
-        <button onclick="submitScore()">Send Score</button>
-        <button onclick="resetGame()">Try again!</button>
+    <div id="game-over" class="hidden">
+        <h2 style="color: #e74c3c; font-size: 36px; margin-top: 0;">You lose! 🍞🔥</h2>
+        <p id="final-score" style="font-weight: bold; font-size: 20px;"></p>
         
-        <hr>
-        <div id="leaderboard-display" style="margin-top: 20px; text-align: left;">
-            <p>Memuat Leaderboard...</p>
+        <div id="input-area">
+            <input type="text" id="nickname" placeholder="Insert Nickname (Max 10 Chars)" maxlength="10">
+            <button onclick="submitScore()">Send Score</button>
+        </div>
+        
+        <button onclick="resetGame()" style="background-color: #2c3e50;">Try again!</button>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+        
+        <div id="leaderboard-display">
+            <p>Loading leaderboard...</p>
         </div>
     </div>
 
     <script type="module" src="BreadRoad.js"></script>
+
 </body>
 </html>
