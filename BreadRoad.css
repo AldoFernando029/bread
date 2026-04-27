@@ -1,35 +1,35 @@
-/* DASAR & BACKGROUND */
+/* DASAR */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1a252f; /* Background luar gelap agar kontras dengan header putih */
-    color: #2c3e50;
+    background-color: #ffffff;
+    color: #f39c12;
     text-align: center;
     overflow: hidden;
 }
 
-/* HEADER MODERN (PUTIH & ORANGE) */
+/* AREA HEADER ATAS */
 .game-info {
     padding: 25px 10px;
-    background-color: #ffffff; /* Latar Putih Bersih */
-    box-shadow: 0 2px 15px rgba(0,0,0,0.05); /* Bayangan tipis */
+    background-color: ; /* Latar Putih Bersih */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Shadow tipis */
     position: relative;
     z-index: 10;
-    border-bottom: 2px solid #f39c12; /* Garis aksen orange di bawah header */
 }
 
 .game-info h1 {
     margin: 0;
     font-size: 36px;
     font-weight: 850;
-    color: #f39c12; /* Judul Orange agar cantik di atas putih */
+    /* Menggunakan Orange game agar popping di atas putih */
+    color: #ffffff; 
     text-transform: none; 
     letter-spacing: 0.5px;
 }
 
 .game-info p {
-    color: #34495e; /* Teks instruksi abu-abu gelap agar kontras */
+    color: #ffffff; 
     font-size: 14px;
     margin-top: 5px;
     font-weight: 500;
@@ -38,8 +38,8 @@ body {
 #score {
     font-size: 26px;
     font-weight: bold;
-    color: #ffffff;
-    background-color: #f39c12;
+    color: #f39c12;
+    background-color: #ffffff; 
     display: inline-block;
     padding: 8px 35px;
     border-radius: 12px;
@@ -52,7 +52,7 @@ body {
 #game-container {
     width: 350px;
     height: 600px;
-    border: 5px solid #ffffff;
+    border: 5px solid #ffffff; /* Border putih tipis sebagai pemisah */
     margin: 15px auto;
     position: relative;
     overflow: hidden;
@@ -68,7 +68,7 @@ body {
     to { background-position-y: 600px; }
 }
 
-/* HERO & API */
+/* Player & Api */
 #player {
     width: 160px; 
     height: 160px;
@@ -76,7 +76,7 @@ body {
     bottom: 30px;
     transition: left 0.12s ease-out;
     z-index: 5;
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4)) brightness(1.05);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)) brightness(1.05);
 }
 
 #player img {
@@ -109,14 +109,12 @@ body {
     border-radius: 25px;
     border: 3px solid #f39c12;
     z-index: 100;
-    color: white; 
 }
 
 #final-score {
     color: white !important;
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 20px;
 }
 
 button {
@@ -128,19 +126,17 @@ button {
     border: none;
     color: white;
     border-radius: 12px;
-    transition: 0.2s ease;
+    transition: 0.2s;
     margin: 8px;
 }
 
-button:hover { 
-    background-color: #e67e22; 
-    transform: translateY(-2px); 
-}
+button:hover { background-color: #e67e22; transform: translateY(-2px); }
 
 #leaderboard-display h4 {
     color: #f1c40f;
     text-align: center;
     margin-top: 25px;
+    text-transform: uppercase;
 }
 
 #leaderboard-display ul {
@@ -150,6 +146,7 @@ button:hover {
     list-style: none;
 }
 
+/* Scrollbar Style */
 #leaderboard-display ul::-webkit-scrollbar { width: 5px; }
 #leaderboard-display ul::-webkit-scrollbar-thumb {
     background: #f39c12;
