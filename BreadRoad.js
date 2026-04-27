@@ -19,7 +19,7 @@ const db = getFirestore(app);
 let score = 0;
 let playerX = 110; 
 let isGameOver = false;
-let hasSubmitted = false; // fungsi utama untuk satu sesi mati
+let hasSubmitted = false; 
 let gameSpeed = 7; 
 let animationId;
 let obstacles = []; 
@@ -32,7 +32,7 @@ const scoreElement = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
-// LOGIKA FIREBOARD (DATABASE) 
+//  LOGIKA FIREBOARD (DATABASE) 
 
 function getWeeklyId() {
     const now = new Date();
@@ -48,13 +48,11 @@ window.submitScore = async function() {
     const name = nameInput.value.trim() || "anonym";
     const finalScore = Math.floor(score);
 
-    // Proteksi ganda: cek variabel dan cek apakah skor valid
     if (hasSubmitted) return; 
     if (finalScore <= 0) return alert("Please Try again!");
 
     try {
-        hasSubmitted = true; // Kunci akses segera
-        
+        hasSubmitted = true; 
         if (submitBtn) {
             submitBtn.disabled = true;
             submitBtn.innerText = "Sending...";
@@ -66,11 +64,9 @@ window.submitScore = async function() {
             timestamp: new Date()
         });
 
-        // LOCKDOWN UI: Sembunyikan input dan tombol agar tidak bisa disalahgunakan
         nameInput.style.display = 'none'; 
         submitBtn.style.display = 'none';
 
-        // Tampilkan pesan sukses di tempat input tadi
         const successMsg = document.createElement('p');
         successMsg.id = "success-msg";
         successMsg.innerHTML = "Score submitted!";
@@ -80,7 +76,7 @@ window.submitScore = async function() {
 
         loadLeaderboard(); 
     } catch (e) {
-        hasSubmitted = false; // Buka kunci jika gagal (misal koneksi putus)
+        hasSubmitted = false; 
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerText = "Submit Score";
@@ -97,33 +93,33 @@ async function loadLeaderboard() {
         const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
         
-        let html = `<h4 style="color: #f1c40f; text-align: center; margin-top: 20px; text-transform: uppercase;">🏆 Top 10 Bread Masters</h4>`;
+        let html = `<h4 style="color: #f39c12; text-align: center; margin-top: 20px;">🏆 Top 10 Bread Masters</h4>`;
         html += `<ul style="list-style: none; padding: 0; margin: 10px auto; max-width: 250px;">`;
         
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             html += `
-                <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); color: white; font-family: sans-serif;">
+                <li style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.1); color: #333; font-family: sans-serif;">
                     <span style="font-weight: bold;">${data.name}</span>
-                    <span style="color: #f1c40f; font-weight: bold;">${data.score} pts</span>
+                    <span style="color: #f39c12; font-weight: bold;">${data.score} pts</span>
                 </li>`;
         });
         
         html += "</ul>";
         display.innerHTML = html;
     } catch (e) {
-        display.innerHTML = "<p style='color: white;'>Gagal memuat skor.</p>";
+        display.innerHTML = "<p>Gagal memuat skor.</p>";
     }
 }
 
-// LOGIKA GAMEPLAY
+// LOGIKA GAMEPLAY 
 
 document.addEventListener('keydown', (e) => {
     if (isGameOver) return;
     const key = e.key.toLowerCase();
     if ((key === 'arrowleft' || key === 'a') && playerX > 10) playerX -= 100;
     if ((key === 'arrowright' || key === 'd') && playerX < 210) playerX += 100;
-    player.style.left = (playerX - 15) + 'px';
+    player.style.left = (playerX - 10) + 'px'; 
 });
 
 document.addEventListener('touchstart', (e) => {
@@ -131,7 +127,7 @@ document.addEventListener('touchstart', (e) => {
     const touchX = e.touches[0].clientX;
     if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
     else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
-    player.style.left = (playerX - 15) + 'px'; 
+    player.style.left = (playerX - 10) + 'px'; 
     e.preventDefault();
 }, { passive: false });
 
@@ -177,7 +173,7 @@ function gameLoop() {
     animationId = requestAnimationFrame(gameLoop);
 }
 
-// TRANSISI STATE (END & RESET) 
+// TRANSISI STATE 
 
 function endGame() {
     isGameOver = true;
@@ -192,10 +188,9 @@ window.resetGame = function() {
     gameSpeed = 7;
     playerX = 110; 
     isGameOver = false;
-    hasSubmitted = false; // Reset 
+    hasSubmitted = false; 
     spawnTimer = 0;
     
-    // Kembalikan UI ke kondisi semula
     const nameInput = document.getElementById('nickname');
     const submitBtn = document.querySelector('button[onclick="submitScore()"]');
     const successMsg = document.getElementById('success-msg');
@@ -215,10 +210,10 @@ window.resetGame = function() {
     obstacles = [];
     scoreElement.innerText = `Score: 0`;
     gameOverScreen.classList.add('hidden');
-    player.style.left = (playerX - 15) + 'px'; 
+    player.style.left = (playerX - 10) + 'px'; 
     gameLoop();
 };
 
-// EKSEKUSI AWAL 
+// EKSEKUSI AWAL
 loadLeaderboard();
 gameLoop();
