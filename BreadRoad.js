@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// FIREBASE CONFIG 
 const firebaseConfig = {
     apiKey: "AIzaSyDvQCFDvSnx7PGQG3KrHBpvooB_VGHbN1Q",
     authDomain: "breadroad-1357.firebaseapp.com",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// GLOBAL STATE 
 let score = 0;
 let playerX = 110; 
 let isGameOver = false;
@@ -30,6 +32,7 @@ const scoreElement = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
+// DATABASE LOGIC 
 function getWeeklyId() {
     const now = new Date();
     const oneJan = new Date(now.getFullYear(), 0, 1);
@@ -51,11 +54,13 @@ window.submitScore = async function() {
     try {
         hasSubmitted = true; 
         if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Sending..."; }
+
         await addDoc(collection(db, getWeeklyId()), {
             name: name.substring(0, 10),
             score: finalScore,
             timestamp: new Date()
         });
+
         if (inputArea) inputArea.innerHTML = "<p style='color:#2ecc71; font-weight:bold;'>Score Submitted! ✅</p>";
         loadLeaderboard(); 
     } catch (e) {
@@ -67,9 +72,11 @@ window.submitScore = async function() {
 async function loadLeaderboard() {
     const display = document.getElementById('leaderboard-display');
     if (!display) return; 
+
     try {
         const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
+        
         let html = `<h4 style="color: #f39c12; text-align: center; margin: 10px 0;">🏆 TOP 10 MASTERS</h4><ul style="list-style:none; padding:0;">`;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
@@ -82,8 +89,9 @@ async function loadLeaderboard() {
     } catch (e) { display.innerHTML = "<p>Gagal memuat skor.</p>"; }
 }
 
-// POSISI SIMETRIS (Offset -10)
+// GAME CONTROLS (OFFSET -10 SYNC) 
 function updatePlayerPosition() {
+    // Offset -10 agar roti 150px pas di tengah jalur 350px (SUDAH BENAR)
     player.style.left = (playerX - 10) + 'px'; 
 }
 
@@ -100,15 +108,19 @@ document.addEventListener('touchstart', (e) => {
     const touchX = e.touches[0].clientX;
     if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
     else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
+    
+    // Sinkron dengan kontrol keyboard (Offset -10)
     player.style.left = (playerX - 10) + 'px'; 
     e.preventDefault();
 }, { passive: false });
 
+// GAME ENGINE 
 function createObstacle() {
     const obsDiv = document.createElement('div');
     obsDiv.classList.add('obstacle');
     const laneX = lanes[Math.floor(Math.random() * lanes.length)];
-    obsDiv.style.left = laneX + 'px'; // API SEJAJAR JALUR
+    // Api disejajarkan langsung dengan jalur untuk posisi simetris (SUDAH BENAR)
+    obsDiv.style.left = laneX + 'px'; 
     obsDiv.style.top = '-150px';
     obsDiv.innerHTML = `<img src="Fire.png" alt="Fire">`;
     obstacleContainer.appendChild(obsDiv);
@@ -117,12 +129,18 @@ function createObstacle() {
 
 function gameLoop() {
     if (isGameOver) return;
+    
     score += 0.15;
     scoreElement.innerText = `Score: ${Math.floor(score)}`;
-    if (Math.floor(score) > 0 && Math.floor(score) % 150 === 0 && gameSpeed < 18) gameSpeed += 0.1;
+    
+    if (Math.floor(score) > 0 && Math.floor(score) % 150 === 0 && gameSpeed < 18) {
+        gameSpeed += 0.1;
+    }
 
     spawnTimer++;
-    if (spawnTimer > Math.max(40, 85 - Math.floor(score / 30))) {
+    let currentSpawnInterval = Math.max(40, 85 - Math.floor(score / 30));
+    
+    if (spawnTimer > currentSpawnInterval) {
         obstacles.push(createObstacle());
         spawnTimer = 0;
     }
@@ -131,15 +149,16 @@ function gameLoop() {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
         
-        // --- HITBOX REVISION (LEBIH ADIL) ---
-        // Range Y diciutkan agar tidak kena "belakang" api
-        // Jarak X diciutkan dari 55 ke 40 agar pixel-perfect
-        if (obs.y > 440 && obs.y < 520 && Math.abs(playerX - obs.x) < 40) {
+        // HITBOX REVISION (LEBIH KECIL) 
+        // Range Y diciutkan (Dari 520 ke 490) agar deteksi tabrakan berakhir lebih cepat saat api lewat.
+        // Jarak X diciutkan (Dari 40 ke 30) agar manuver horizontal lebih presisi.
+        if (obs.y > 440 && obs.y < 490 && Math.abs(playerX - obs.x) < 30) {
             endGame();
         }
         
         if (obs.y > 700) { obs.element.remove(); obstacles.splice(index, 1); }
     });
+    
     animationId = requestAnimationFrame(gameLoop);
 }
 
@@ -151,9 +170,12 @@ function endGame() {
     loadLeaderboard(); 
 }
 
-window.resetGame = function() { location.reload(); };
+window.resetGame = function() {
+    location.reload(); 
+};
 
-// START
+// START 
+// Gunakan -10 saat inisialisasi awal agar simetris
 player.style.left = (playerX - 10) + 'px'; 
 loadLeaderboard();
 gameLoop();
