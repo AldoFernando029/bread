@@ -91,7 +91,6 @@ async function loadLeaderboard() {
 
 // GAME CONTROLS (OFFSET -10 SYNC) 
 function updatePlayerPosition() {
-    // Offset -10 agar roti 150px pas di tengah jalur 350px (SUDAH BENAR)
     player.style.left = (playerX - 10) + 'px'; 
 }
 
@@ -109,7 +108,6 @@ document.addEventListener('touchstart', (e) => {
     if (touchX < window.innerWidth / 2 && playerX > 10) playerX -= 100;
     else if (touchX >= window.innerWidth / 2 && playerX < 210) playerX += 100;
     
-    // Sinkron dengan kontrol keyboard (Offset -10)
     player.style.left = (playerX - 10) + 'px'; 
     e.preventDefault();
 }, { passive: false });
@@ -119,7 +117,6 @@ function createObstacle() {
     const obsDiv = document.createElement('div');
     obsDiv.classList.add('obstacle');
     const laneX = lanes[Math.floor(Math.random() * lanes.length)];
-    // Api disejajarkan langsung dengan jalur untuk posisi simetris (SUDAH BENAR)
     obsDiv.style.left = laneX + 'px'; 
     obsDiv.style.top = '-150px';
     obsDiv.innerHTML = `<img src="Fire.png" alt="Fire">`;
@@ -149,10 +146,11 @@ function gameLoop() {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
         
-        // HITBOX REVISION (LEBIH KECIL) 
-        // Range Y diciutkan (Dari 520 ke 490) agar deteksi tabrakan berakhir lebih cepat saat api lewat.
-        // Jarak X diciutkan (Dari 40 ke 30) agar manuver horizontal lebih presisi.
-        if (obs.y > 440 && obs.y < 490 && Math.abs(playerX - obs.x) < 30) {
+        // PERBAIKAN HITBOX DISINI
+        // turunkan ambang batas 'y' (dimulai dari 380) agar 
+        // tabrakan terdeteksi saat moncong api baru menyentuh roti.
+        // Range: 380 sampai 480.
+        if (obs.y > 380 && obs.y < 480 && Math.abs(playerX - obs.x) < 35) {
             endGame();
         }
         
@@ -175,7 +173,6 @@ window.resetGame = function() {
 };
 
 // START 
-// Gunakan -10 saat inisialisasi awal agar simetris
 player.style.left = (playerX - 10) + 'px'; 
 loadLeaderboard();
 gameLoop();
