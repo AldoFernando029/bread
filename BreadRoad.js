@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// KONFIGURASI FIREBASE 
 const firebaseConfig = {
   apiKey: "AIzaSyDvQCFDvSnx7PGQG3KrHBpvooB_VGHbN1Q",
   authDomain: "breadroad-1357.firebaseapp.com",
@@ -14,11 +15,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// VARIABEL GLOBAL GAME 
+// VARIABEL GLOBAL 
 let score = 0;
 let playerX = 110; 
 let isGameOver = false;
-let hasSubmitted = false; //Mencegah submit berkali-kali
+let hasSubmitted = false; // fungsi utama untuk satu sesi mati
 let gameSpeed = 7; 
 let animationId;
 let obstacles = []; 
@@ -31,7 +32,7 @@ const scoreElement = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
-// LOGIKA FIREBASE (LEADERBOARD)
+// LOGIKA FIREBOARD (DATABASE) 
 
 function getWeeklyId() {
     const now = new Date();
@@ -43,16 +44,17 @@ function getWeeklyId() {
 
 window.submitScore = async function() {
     const nameInput = document.getElementById('nickname');
-    const submitBtn = document.querySelector('#game-over button[onclick="submitScore()"]');
+    const submitBtn = document.querySelector('button[onclick="submitScore()"]');
     const name = nameInput.value.trim() || "Roti Misterius";
     const finalScore = Math.floor(score);
 
-    // Proteksi: Jika sudah kirim atau skor 0, jangan jalan
+    // Proteksi ganda: cek variabel dan cek apakah skor valid
     if (hasSubmitted) return; 
-    if (finalScore <= 0) return alert("Please Try again!");
+    if (finalScore <= 0) return alert("Main dulu baru kirim skor, Do!");
 
     try {
-        hasSubmitted = true; // Kunci akses
+        hasSubmitted = true; // Kunci akses segera
+        
         if (submitBtn) {
             submitBtn.disabled = true;
             submitBtn.innerText = "Mengirim...";
@@ -64,16 +66,26 @@ window.submitScore = async function() {
             timestamp: new Date()
         });
 
-        alert("Skor Berhasil Dikirim!");
-        if (submitBtn) submitBtn.innerText = "Terkirim! ✅";
+        // LOCKDOWN UI: Sembunyikan input dan tombol agar tidak bisa disalahgunakan
+        nameInput.style.display = 'none'; 
+        submitBtn.style.display = 'none';
+
+        // Tampilkan pesan sukses di tempat input tadi
+        const successMsg = document.createElement('p');
+        successMsg.id = "success-msg";
+        successMsg.innerHTML = "Score submitted!";
+        successMsg.style.color = "#2ecc71";
+        successMsg.style.fontWeight = "bold";
+        nameInput.parentNode.insertBefore(successMsg, nameInput);
+
         loadLeaderboard(); 
     } catch (e) {
-        hasSubmitted = false; // Buka kunci jika gagal agar bisa coba lagi
+        hasSubmitted = false; // Buka kunci jika gagal (misal koneksi putus)
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerText = "Kirim Skor";
         }
-        console.error("Gagal kirim skor: ", e);
+        console.error("Error: ", e);
     }
 };
 
@@ -104,7 +116,7 @@ async function loadLeaderboard() {
     }
 }
 
-// LOGIKA INTI GAME
+// LOGIKA GAMEPLAY
 
 document.addEventListener('keydown', (e) => {
     if (isGameOver) return;
@@ -165,6 +177,8 @@ function gameLoop() {
     animationId = requestAnimationFrame(gameLoop);
 }
 
+// TRANSISI STATE (END & RESET) 
+
 function endGame() {
     isGameOver = true;
     cancelAnimationFrame(animationId);
@@ -178,15 +192,24 @@ window.resetGame = function() {
     gameSpeed = 7;
     playerX = 110; 
     isGameOver = false;
-    hasSubmitted = false; // Reset agar bisa submit di game baru
+    hasSubmitted = false; // Reset 
     spawnTimer = 0;
     
-    // Reset Tombol
-    const submitBtn = document.querySelector('#game-over button[onclick="submitScore()"]');
+    // Kembalikan UI ke kondisi semula
+    const nameInput = document.getElementById('nickname');
+    const submitBtn = document.querySelector('button[onclick="submitScore()"]');
+    const successMsg = document.getElementById('success-msg');
+    
+    if (nameInput) {
+        nameInput.style.display = 'block';
+        nameInput.value = ""; 
+    }
     if (submitBtn) {
+        submitBtn.style.display = 'inline-block';
         submitBtn.disabled = false;
         submitBtn.innerText = "Kirim Skor";
     }
+    if (successMsg) successMsg.remove();
 
     obstacles.forEach(obs => obs.element.remove());
     obstacles = [];
@@ -196,6 +219,6 @@ window.resetGame = function() {
     gameLoop();
 };
 
-// Start 
+// EKSEKUSI AWAL 
 loadLeaderboard();
 gameLoop();
