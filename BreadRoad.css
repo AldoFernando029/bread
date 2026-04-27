@@ -1,59 +1,55 @@
-\body {
+/* DASAR & BACKGROUND  */
+body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1a252f;
+    background: radial-gradient(circle, #2c3e50 0%, #000000 100%);
     color: white;
     text-align: center;
     overflow: hidden;
 }
 
-/* Pastikan warna skor akhir putih */
-#final-score {
-    color: white !important; /* Gunakan important agar tidak tertimpa style lain */
-    font-weight: bold;
-}
-
-/* Ukuran Roti tetap 160px */
-#player {
-    width: 160px;
-    height: 160px;
-    position: absolute;
-    bottom: 30px;
-    transition: left 0.12s ease-out;
-    z-index: 5;
-}
-
-/* Ukuran Api tetap 130px */
-.obstacle {
-    width: 130px;
-    height: 130px;
-    position: absolute;
-    z-index: 4;
-}
-
+/* AREA HEADER ATAS */
 .game-info {
-    padding: 20px;
-    /* Efek Gradasi Biru Gelap ke Hitam agar terlihat mewah */
-    background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
-    border-bottom: 3px solid #f39c12; /* Garis pembatas warna orange bread */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    padding: 20px 10px;
+    background-color: #f39c12; /* Orange cerah yang solid & bersih */
+    border-bottom: none; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+    position: relative;
+    z-index: 10;
 }
 
 .game-info h1 {
     margin: 0;
-    font-size: 36px;
-    color: #f1c40f; /* Warna emas */
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    letter-spacing: 3px;
+    font-size: 32px; 
+    font-weight: 800;
+    color: #ffffff; /* Judul Putih */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: none; 
 }
 
 .game-info p {
-    color: #bdc3c7; /* Warna silver halus */
-    font-size: 14px;
+    color: #ffffff; /* Instruksi Putih */
+    font-size: 13px;
     margin-top: 5px;
+    font-weight: 500;
+    opacity: 0.9; 
 }
 
+#score {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff; /* Score Putih */
+    background: transparent; 
+    display: inline-block;
+    padding: 5px 20px;
+    border-radius: 0; 
+    margin-top: 10px;
+    border: 2px solid #ffffff; 
+}
+
+/* CONTAINER GAME */
 #game-container {
     width: 350px;
     height: 600px;
@@ -62,11 +58,9 @@
     position: relative;
     overflow: hidden;
     border-radius: 15px;
-    /* BACKGROUND JALAN PORTRAIT */
     background-image: url('Jalan.jpg');
     background-size: cover;
     background-position: center;
-    /* Animasi jalan bergerak maju */
     animation: moveRoad 1.5s linear infinite;
 }
 
@@ -75,16 +69,31 @@
     to { background-position-y: 600px; }
 }
 
+/* HERO & OBSTACLE */
 #player {
-    width: 160px;
+    width: 160px; /* ukuran 160px */
     height: 160px;
     position: absolute;
     bottom: 30px;
     transition: left 0.12s ease-out;
     z-index: 5;
+    /* EFEK WARNA: Agar roti menonjol/bersinar dan tidak kusam */
+    filter: drop-shadow(0 0 12px rgba(241, 196, 15, 0.7)) brightness(1.1) saturate(1.2);
 }
 
-/* Class untuk api yang muncul dinamis */
+#player img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Animasi membal halus agar roti terlihat "hidup" */
+    animation: breadBob 2s ease-in-out infinite;
+}
+
+@keyframes breadBob {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
 .obstacle {
     width: 130px;
     height: 130px;
@@ -92,29 +101,38 @@
     z-index: 4;
 }
 
-#player img, .obstacle img {
+.obstacle img {
     width: 100%;
     height: 100%;
     object-fit: contain;
 }
 
+/* GAME OVER & LEADERBOARD */
 #game-over {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.95);
-    padding: 40px;
+    padding: 30px;
     border-radius: 20px;
     border: 3px solid #e67e22;
     z-index: 100;
+    min-width: 280px;
+}
+
+#final-score {
+    color: white !important;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
 }
 
 .hidden { display: none; }
 
 button {
     padding: 12px 25px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     background-color: #e67e22;
@@ -122,36 +140,39 @@ button {
     color: white;
     border-radius: 8px;
     transition: 0.2s;
+    margin: 5px;
 }
 
-button:hover { background-color: #d35400; }
+button:hover { background-color: #d35400; transform: scale(1.05); }
 
-@media (max-width: 450px) {
-    #game-container {
-        width: 90vw;
-        height: 75vh;
-    }
-}
-
+/* LEADERBOARD LIST STYLE */
 #leaderboard-display h4 {
-    color: #f1c40f; /* Warna emas buat judul */
+    color: #f1c40f;
     text-align: center;
-    margin-bottom: 15px;
+    margin: 20px 0 10px 0;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
 
 #leaderboard-display ul {
-    max-height: 200px; /* Biar kalau datanya banyak bisa di-scroll */
+    max-height: 180px;
     overflow-y: auto;
-    padding-right: 5px;
+    padding: 0 10px;
+    list-style: none;
 }
 
-/* Style buat scrollbar-nya biar keren juga */
 #leaderboard-display ul::-webkit-scrollbar {
     width: 5px;
 }
 #leaderboard-display ul::-webkit-scrollbar-thumb {
     background: #f39c12;
     border-radius: 10px;
+}
+
+/*  MOBILE RESPONSIVE */
+@media (max-width: 450px) {
+    #game-container {
+        width: 90vw;
+        height: 70vh;
+    }
 }
