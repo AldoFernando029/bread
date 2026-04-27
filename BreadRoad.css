@@ -33,8 +33,25 @@
 }
 
 .game-info {
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    /* Efek Gradasi Biru Gelap ke Hitam agar terlihat mewah */
+    background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+    border-bottom: 3px solid #f39c12; /* Garis pembatas warna orange bread */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.game-info h1 {
+    margin: 0;
+    font-size: 36px;
+    color: #f1c40f; /* Warna emas */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 3px;
+}
+
+.game-info p {
+    color: #bdc3c7; /* Warna silver halus */
+    font-size: 14px;
+    margin-top: 5px;
 }
 
 #game-container {

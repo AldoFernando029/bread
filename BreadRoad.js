@@ -45,19 +45,19 @@ function getWeeklyId() {
 window.submitScore = async function() {
     const nameInput = document.getElementById('nickname');
     const submitBtn = document.querySelector('button[onclick="submitScore()"]');
-    const name = nameInput.value.trim() || "Roti Misterius";
+    const name = nameInput.value.trim() || "anonym";
     const finalScore = Math.floor(score);
 
     // Proteksi ganda: cek variabel dan cek apakah skor valid
     if (hasSubmitted) return; 
-    if (finalScore <= 0) return alert("Main dulu baru kirim skor, Do!");
+    if (finalScore <= 0) return alert("Please Try again!");
 
     try {
         hasSubmitted = true; // Kunci akses segera
         
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = "Mengirim...";
+            submitBtn.innerText = "Sending...";
         }
 
         await addDoc(collection(db, getWeeklyId()), {
@@ -83,7 +83,7 @@ window.submitScore = async function() {
         hasSubmitted = false; // Buka kunci jika gagal (misal koneksi putus)
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerText = "Kirim Skor";
+            submitBtn.innerText = "Submit Score";
         }
         console.error("Error: ", e);
     }
