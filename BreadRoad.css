@@ -1,9 +1,9 @@
-/* DASAR (PAS DI LAYAR PC/MOBILE Tanpa Scroll) */
+/* DASAR (FIT TO SCREEN) */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ffffff; /* Latar luar putih minimalis */
+    background-color: #ffffff; /* Latar luar putih bersih */
     color: #333;
     text-align: center;
     height: 100vh;
@@ -12,13 +12,14 @@ body {
     overflow: hidden;
 }
 
-/* HEADER ORANGE */
+/* HEADER */
 .game-info {
     padding: 12px 10px;
-    background-color: #f39c12; /* Warna Oren Roti */
+    background-color: #f39c12;
     color: white;
     flex-shrink: 0;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 20;
 }
 
 .game-info h1 {
@@ -27,7 +28,7 @@ body {
     font-weight: 800;
     color: #ffffff;
     text-transform: none; 
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 
 .game-info p {
@@ -52,37 +53,40 @@ body {
 /* CONTAINER GAME */
 #game-container {
     width: 350px;
-    flex-grow: 1; /* Otomatis ngisi sisa layar */
-    max-height: 72vh; /* Agar pas di PC tanpa scroll */
+    flex-grow: 1;
+    max-height: 72vh;
     margin: 10px auto;
     position: relative;
     overflow: hidden;
     border-radius: 20px;
-    border: 12px solid #f39c12; /* Border dipertebal */
+    border: 12px solid #f39c12; /* Border tebal oren */
+    background-color: #ffffff;
     background-image: url('Jalan.jpg');
     background-repeat: repeat-y;
     background-size: 100% auto;
-    animation: moveRoad 3s linear infinite; 
+    /* SPEED FIX: 1.2s biar gak tersendat */
+    animation: moveRoad 1.2s linear infinite;
+    will-change: background-position; 
 }
 
 @keyframes moveRoad {
     from { background-position-y: 0; }
-    to { background-position-y: 600px; }
+    to { background-position-y: 500px; } 
 }
 
-/* Player & Api */
+/* Player & OBSTACLE */
 #player {
-    width: 150px; 
+    width: 150px;
     height: 150px;
     position: absolute;
     bottom: 20px;
     transition: left 0.1s ease-out;
     z-index: 10;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
 }
 
 .obstacle {
-    width: 130px; 
+    width: 130px;
     height: 130px;
     position: absolute;
     z-index: 5;
@@ -94,16 +98,16 @@ body {
     object-fit: contain;
 }
 
-/* GAME OVER  */
+/* LEADERBOARD */
 #game-over {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: white;
-    padding: 30px;
+    padding: 25px;
     border-radius: 20px;
-    border: 5px solid #f39c12;
+    border: 4px solid #f39c12;
     z-index: 100;
     box-shadow: 0 15px 40px rgba(0,0,0,0.2);
     min-width: 280px;
@@ -113,27 +117,21 @@ body {
     color: #f39c12 !important;
     font-size: 22px;
     font-weight: bold;
-    margin-bottom: 15px;
 }
 
 button {
-    padding: 12px 25px;
+    padding: 10px 25px;
     background: #f39c12;
     color: white;
     border: none;
     border-radius: 10px;
     font-weight: bold;
-    font-size: 16px;
     cursor: pointer;
-    transition: 0.2s;
+    margin: 5px;
 }
 
-button:hover { background: #e67e22; transform: scale(1.05); }
-
-/* LEADERBOARD LIST */
-#leaderboard-display h4 { color: #f39c12; margin: 15px 0 10px; }
 #leaderboard-display ul {
-    max-height: 160px;
+    max-height: 150px;
     overflow-y: auto;
     padding: 0;
     list-style: none;

@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// KONFIGURASI FIREBASE 
 const firebaseConfig = {
   apiKey: "AIzaSyDvQCFDvSnx7PGQG3KrHBpvooB_VGHbN1Q",
   authDomain: "breadroad-1357.firebaseapp.com",
@@ -15,7 +14,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// VARIABEL GLOBAL
 let score = 0;
 let playerX = 110; 
 let isGameOver = false;
@@ -32,7 +30,6 @@ const scoreElement = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreText = document.getElementById('final-score');
 
-// LOGIKA FIREBASE 
 function getWeeklyId() {
     const now = new Date();
     const oneJan = new Date(now.getFullYear(), 0, 1);
@@ -48,7 +45,7 @@ window.submitScore = async function() {
     const finalScore = Math.floor(score);
 
     if (hasSubmitted) return; 
-    if (finalScore <= 0) return alert("Coba main lagi, Do!");
+    if (finalScore <= 0) return alert("Coba lagi, Do!");
 
     try {
         hasSubmitted = true; 
@@ -91,13 +88,13 @@ async function loadLeaderboard() {
         const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
         
-        let html = `<h4 style="color: #f39c12; text-align: center;">🏆 TOP 10 MASTERS</h4>`;
+        let html = `<h4 style="color: #f39c12; text-align: center; margin-top: 10px;">🏆 TOP 10 MASTERS</h4>`;
         html += `<ul style="list-style: none; padding: 0;">`;
         
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             html += `
-                <li style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.1); color: #333; font-size: 14px;">
+                <li style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.05); color: #333; font-size: 13px;">
                     <span style="font-weight: bold;">${data.name}</span>
                     <span style="color: #f39c12; font-weight: bold;">${data.score} pts</span>
                 </li>`;
@@ -110,9 +107,8 @@ async function loadLeaderboard() {
     }
 }
 
-// KONTROL PERGERAKAN (OFFSET -25)
 function updatePlayerPosition() {
-    // Offset -25 agar Roti 150px pas di tengah jalur
+    // Offset -25 agar roti 150px pas di tengah jalur 350px
     player.style.left = (playerX - 25) + 'px'; 
 }
 
@@ -133,12 +129,11 @@ document.addEventListener('touchstart', (e) => {
     e.preventDefault();
 }, { passive: false });
 
-// GAME ENGINE 
 function createObstacle() {
     const obsDiv = document.createElement('div');
     obsDiv.classList.add('obstacle');
     const laneX = lanes[Math.floor(Math.random() * lanes.length)];
-    // Offset -15 agar Api 130px pas di tengah jalur
+    // Offset -15 agar api 130px pas di tengah jalur
     obsDiv.style.left = (laneX - 15) + 'px'; 
     obsDiv.style.top = '-150px';
     obsDiv.innerHTML = `<img src="Fire.png" alt="Fire">`;
@@ -168,7 +163,6 @@ function gameLoop() {
         obs.y += gameSpeed;
         obs.element.style.top = obs.y + 'px';
 
-        // Hitbox Collision (Hitbox roti 150px & api 130px)
         if (obs.y > 420 && obs.y < 560 && Math.abs(playerX - obs.x) < 55) {
             endGame();
         }
@@ -182,7 +176,6 @@ function gameLoop() {
     animationId = requestAnimationFrame(gameLoop);
 }
 
-// TRANSISI STATE 
 function endGame() {
     isGameOver = true;
     cancelAnimationFrame(animationId);
@@ -223,7 +216,6 @@ window.resetGame = function() {
     gameLoop();
 };
 
-// START 
 updatePlayerPosition();
 loadLeaderboard();
 gameLoop();
