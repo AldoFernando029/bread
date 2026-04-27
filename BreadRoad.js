@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// LOGIKA FIREBASE
+// LOGIKA FIREBASE 
 
 function getWeeklyId() {
     const now = new Date();
@@ -29,6 +29,8 @@ window.submitScore = async function() {
     const name = nameInput.value.trim() || "Roti Misterius";
     const finalScore = Math.floor(score);
 
+    if (finalScore <= 0) return alert("Main dulu baru kirim skor, Do! wkwk");
+
     try {
         await addDoc(collection(db, getWeeklyId()), {
             name: name.substring(0, 10),
@@ -36,7 +38,7 @@ window.submitScore = async function() {
             timestamp: new Date()
         });
         alert("Skor Berhasil Dikirim!");
-        nameInput.value = ""; // Bersihkan input setelah kirim
+        nameInput.value = ""; 
         loadLeaderboard(); 
     } catch (e) {
         console.error("Gagal kirim skor: ", e);
@@ -45,23 +47,37 @@ window.submitScore = async function() {
 
 async function loadLeaderboard() {
     const display = document.getElementById('leaderboard-display');
-    if (!display) return; // Safety check
+    if (!display) return; 
+
     try {
         const q = query(collection(db, getWeeklyId()), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
         
-        let html = "<h4>🏆 Top 10 Bread Masters</h4><ul style='list-style: none; padding: 0;'>";
+        // Styling Judul Leaderboard
+        let html = `<h4 style="color: #f1c40f; text-align: center; margin-top: 20px; text-transform: uppercase;">🏆 Top 10 Bread Masters</h4>`;
+        html += `<ul style="list-style: none; padding: 0; margin: 10px auto; max-width: 250px;">`;
+        
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            html += `<li style="border-bottom: 1px solid #eee; padding: 5px 0; display: flex; justify-content: space-between;">
-                        <span><b>${data.name}</b></span>
-                        <span>${data.score} pts</span>
-                     </li>`;
+            // Styling tiap baris: Nama Putih, Skor Emas, Ada garis bawah tipis
+            html += `
+                <li style="
+                    display: flex; 
+                    justify-content: space-between; 
+                    padding: 8px 0; 
+                    border-bottom: 1px solid rgba(255,255,255,0.1); 
+                    color: white; 
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                ">
+                    <span style="font-weight: bold;">${data.name}</span>
+                    <span style="color: #f1c40f; font-weight: bold;">${data.score} pts</span>
+                </li>`;
         });
+        
         html += "</ul>";
         display.innerHTML = html;
     } catch (e) {
-        display.innerHTML = "<p>Gagal memuat skor.</p>";
+        display.innerHTML = "<p style='color: white;'>Gagal memuat skor.</p>";
         console.error(e);
     }
 }
@@ -149,7 +165,7 @@ function endGame() {
     cancelAnimationFrame(animationId);
     finalScoreText.innerText = `Your Final Score: ${Math.floor(score)}`;
     gameOverScreen.classList.remove('hidden');
-    loadLeaderboard(); // PENTING: Memuat skor orang lain saat kalah
+    loadLeaderboard(); 
 }
 
 window.resetGame = function() {

@@ -115,3 +115,26 @@ button:hover { background-color: #d35400; }
         height: 75vh;
     }
 }
+
+#leaderboard-display h4 {
+    color: #f1c40f; /* Warna emas buat judul */
+    text-align: center;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#leaderboard-display ul {
+    max-height: 200px; /* Biar kalau datanya banyak bisa di-scroll */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Style buat scrollbar-nya biar keren juga */
+#leaderboard-display ul::-webkit-scrollbar {
+    width: 5px;
+}
+#leaderboard-display ul::-webkit-scrollbar-thumb {
+    background: #f39c12;
+    border-radius: 10px;
+}
